@@ -1,0 +1,38 @@
+**The problem** 
+The image built on a ARM64 machine does not run on the same machine, a new Mac with an ARM64 processor.
+
+Long description: I would like to build a two-dockers system for teaching networking protocols. One of them has to run Wireshark for packet capture and analysis. Some students have amd64, others have arm64. A docker-based lab is a solution, which is going to replace the previous VirtualBox based one. Note that the image built for a amd64 runs on a arm64 architecture, but packet capture does to work :-/ 
+
+**To Reproduce**
+1. git clone https://github.com/fcwu/docker-ubuntu-vnc-desktop.git
+2. cd docker-ubuntu-vnc-desktop
+3. git submodule init; git submodule update
+4. make extra-clean
+5. ARCH=arm64 make build
+6. make run
+
+**Expected behavior**
+At this point, the docker should become accessible using localhost:6080. Instead, the image does not boot, and this is the log:
+
+```
+% make run             
+docker run --privileged --rm \
+-p 6080:80 -p 6081:443 \
+-v /Users/lucapagnesi/Documents/docker/docker-ubuntu-vnc-desktop:/src:ro \
+-e USER=doro -e PASSWORD=mypassword \
+-e ALSADEV=hw:2,0 \
+-e SSL_PORT=443 \
+-e RELATIVE_URL_ROOT=approot \
+-e OPENBOX_ARGS="--startup /usr/bin/galculator" \
+-v /Users/lucapagnesi/Documents/docker/docker-ubuntu-vnc-desktop/ssl:/etc/nginx/ssl \
+--device /dev/snd \
+--name ubuntu-desktop-lxde-test \
+dorowu/ubuntu-desktop-lxde-vnc:latest
+* enable custom user: doro
+cp: cannot stat '/root/.config': No such file or directory
+* enable RELATIVE_URL_ROOT: approot
+qemu-x86_64: Could not open '/lib64/ld-linux-x86-64.so.2': No such file or directory
+make: *** [run] Error 255
+```
+The operating system on the host machine is MacOS.
+
